@@ -1,0 +1,122 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_BUSES 10
+#define MAX_PASSENGERS 100
+
+struct Bus {
+    int busNumber;
+    char source[50];
+    char destination[50];
+    int totalSeats;
+    int availableSeats;
+    float fare;
+};
+
+struct Passenger {
+    char name[50];
+    int age;
+    int seatNumber;
+    int busNumber;
+};
+
+struct Bus buses[MAX_BUSES];
+struct Passenger passengers[MAX_PASSENGERS];
+int numBuses = 0;
+int numPassengers = 0;
+
+void addBus() {
+    if (numBuses == MAX_BUSES) {
+        printf("Maximum number of buses reached.\n");
+        return;
+    }
+
+    struct Bus newBus;
+    printf("Enter bus number: ");
+    scanf("%d", &newBus.busNumber);
+    printf("Enter source: ");
+    scanf("%s", newBus.source);
+    printf("Enter destination: ");
+    scanf("%s", newBus.destination);
+    printf("Enter total seats: ");
+    scanf("%d", &newBus.totalSeats);
+    newBus.availableSeats = newBus.totalSeats;
+    printf("Enter fare: ");
+    scanf("%f", &newBus.fare);
+
+    buses[numBuses++] = newBus;
+    printf("Bus added successfully.\n");
+}
+
+void bookTicket() {
+    if (numBuses == 0) {
+        printf("No buses available.\n");
+        return;
+    }
+
+    printf("Available buses:\n");
+    for (int i = 0; i < numBuses; i++) {
+        printf("%d. Bus Number: %d, Source: %s, Destination: %s, Available Seats: %d, Fare: %.2f\n",
+               i + 1, buses[i].busNumber, buses[i].source, buses[i].destination, buses[i].availableSeats, buses[i].fare);
+    }
+
+    int choice;
+    printf("Enter your choice (1-%d): ", numBuses);
+    scanf("%d", &choice);
+
+    if (choice < 1 || choice > numBuses) {
+        printf("Invalid choice.\n");
+        return;
+    }
+
+    struct Bus selectedBus = buses[choice - 1];
+
+    if (selectedBus.availableSeats == 0) {
+        printf("Sorry, the bus is fully booked.\n");
+        return;
+    }
+
+    struct Passenger newPassenger;
+    printf("Enter passenger name: ");
+    scanf("%s", newPassenger.name);
+    printf("Enter passenger age: ");
+    scanf("%d", &newPassenger.age);
+
+    newPassenger.seatNumber = selectedBus.totalSeats - selectedBus.availableSeats + 1;
+    newPassenger.busNumber = selectedBus.busNumber;
+
+    passengers[numPassengers++] = newPassenger;
+    selectedBus.availableSeats--;
+    buses[choice - 1] = selectedBus;
+
+    printf("Ticket booked successfully!\n");
+}
+
+int main() {
+    int choice;
+
+    do {
+        printf("\nBus Reservation System\n");
+        printf("1. Add Bus\n");
+        printf("2. Book Ticket\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                addBus();
+                break;
+            case 2:
+                bookTicket();
+                break;
+            case 3:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice.\n");
+        }
+    } while (choice != 3);
+
+    return 0;
+}
